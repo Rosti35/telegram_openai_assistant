@@ -2,7 +2,7 @@
 import time
 import datetime
 from telegram.ext import CallbackContext
-from telegram import Update
+from telegram import Update, constants
 from openai import OpenAI
 
 from .config import assistant_id, client_api_key
@@ -64,8 +64,24 @@ async def process_message(update: Update, context: CallbackContext) -> None:
     if count >= 100:
         return
 
+    # Send loading message
+    loading_message = await context.bot.send_message(
+        chat_id=update.effective_chat.id, text="Loading\.\.\.", parse_mode=constants.ParseMode.MARKDOWN_V2
+    )
+
+    # Get answer from assistant
     answer = get_answer(update.message.text)
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=answer)
+
+    # Delete loading message
+    await context.bot.delete_message(
+        chat_id=update.effective_chat.id, message_id=loading_message.message_id
+    )
+
+    # Send the actual answer
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id, text=answer, 
+    )
+
     update_message_count(count + 1)
     save_qa(
         update.effective_user.id,
