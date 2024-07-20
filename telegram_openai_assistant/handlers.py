@@ -5,8 +5,8 @@ from telegram.ext import CallbackContext
 from telegram import Update, constants
 from openai import OpenAI
 
-from .config import assistant_id, client_api_key
-from .utils import get_message_count, update_message_count, save_qa
+from config import assistant_id, client_api_key
+from utils import get_message_count, update_message_count, save_qa
 
 
 client = OpenAI(api_key=client_api_key)
